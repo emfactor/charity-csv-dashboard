@@ -17,9 +17,11 @@
 
 ## ▶️ Run the App
 Visit: charitydashboard.streamlit.app
+
 OR
 
-bash
+'''bash
+
 streamlit run app.py
 
 ## 📄 About the Project
