@@ -2,36 +2,37 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-st.set_page_config(page_title="Charity CSV Dashboard", layout="wide")
+st.set_page_config(page_title="Charity Dashboard", layout="wide")
+
 st.title("📊 Charity Donation Dashboard")
 
-uploaded_file = st.file_uploader("Upload your donation CSV", type="csv")
+# Load CSV
+df = pd.read_csv("sample_charity_data.csv")
 
-if uploaded_file:
-    df = pd.read_csv(uploaded_file, parse_dates=["Date"])
+# 🔧 Convert 'Date' to datetime
+df["Date"] = pd.to_datetime(df["Date"])
+df["Month"] = df["Date"].dt.to_period("M").astype(str)
 
-    st.subheader("Raw Data")
-    st.dataframe(df)
+# Sidebar filters
+campaign = st.sidebar.selectbox("Select Campaign", ["All"] + sorted(df["Campaign"].unique().tolist()))
+if campaign != "All":
+    df = df[df["Campaign"] == campaign]
 
-    st.subheader("Key Metrics")
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Total Raised", f"£{df['Amount'].sum():,.2f}")
-    col2.metric("Unique Donors", df['Donor'].nunique())
-    col3.metric("Campaigns", df['Campaign'].nunique())
+# Summary stats
+total = df["Amount"].sum()
+donations = df.shape[0]
+avg = df["Amount"].mean()
 
-    st.subheader("Monthly Donations")
-    df["Month"] = df["Date"].dt.to_period("M").astype(str)
-    monthly = df.groupby("Month")["Amount"].sum().reset_index()
-    fig = px.bar(monthly, x="Month", y="Amount", title="Donations Over Time", labels={"Amount": "£ Raised"})
-    st.plotly_chart(fig, use_container_width=True)
+col1, col2, col3 = st.columns(3)
+col1.metric("💰 Total Raised", f"£{total:,.2f}")
+col2.metric("🧾 # of Donations", donations)
+col3.metric("📊 Avg Donation", f"£{avg:,.2f}")
 
-    st.subheader("Top Donors")
-    top_donors = df.groupby("Donor")["Amount"].sum().reset_index().sort_values(by="Amount", ascending=False)
-    st.dataframe(top_donors.head(5))
+# Chart
+monthly = df.groupby("Month")["Amount"].sum().reset_index()
+fig = px.bar(monthly, x="Month", y="Amount", title="Monthly Donation Totals", labels={"Amount": "£ Amount"})
+st.plotly_chart(fig, use_container_width=True)
 
-    st.subheader("Donations by Campaign")
-    fig2 = px.pie(df, names="Campaign", values="Amount", title="Donations by Campaign")
-    st.plotly_chart(fig2, use_container_width=True)
-
-else:
-    st.info("👆 Upload a CSV file to get started.")
+# Table
+st.subheader("📋 Raw Donation Data")
+st.dataframe(df.sort_values("Date", ascending=False))
