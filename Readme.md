@@ -16,8 +16,10 @@
 | Alice | 100    | 2024-01-15 | Winter Appeal |
 
 ## ▶️ Run the App
+Visit: charitydashboard.streamlit.app
+OR
 
-```bash
+bash
 streamlit run app.py
 
 ## 📄 About the Project
