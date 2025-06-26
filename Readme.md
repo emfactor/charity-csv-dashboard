@@ -19,3 +19,10 @@
 
 ```bash
 streamlit run app.py
+
+## 📄 About the Project
+
+- Built with Python using [Streamlit](https://streamlit.io/) for quick data visualization.
+- Uses `pandas` for data handling and `plotly` for interactive charts.
+- Visualizes charity donations over time with filtering by campaign.
+- Easy to customize or extend with new features.
